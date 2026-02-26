@@ -3,44 +3,69 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
-import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-});
+// Remove OpenAI import - no longer needed
+// const openai = new OpenAI({...});
 
-async function generateExam(examId: number, url: string, format: string, difficulty: string, count: number, types: any) {
+// VSS endpoint configuration
+const VSS_ENDPOINT = process.env.VSS_ENDPOINT || "http://localhost:9100";
+
+async function generateExam(
+  examId: number, 
+  url: string, 
+  format: string, 
+  difficulty: string, 
+  count: number, 
+  types: any
+) {
   try {
     await storage.updateExam(examId, { status: "processing" });
-    
-    // Simulate NVIDIA VSS by generating questions based on the parameters
-    const prompt = `You are an expert exam setter. Generate an exam paper based on the following configuration.
-Video URL/Topic: ${url}
-Format: ${format}
-Difficulty: ${difficulty}
-Total Questions: ${count}
-Question Types Breakdown: ${JSON.stringify(types)}
 
-Output MUST be a valid JSON object with a single "questions" array.
-Each question should be an object:
-- type: string ("mcq", "short-answer", "long-answer")
-- question: string
-- options: array of strings (ONLY if type is "mcq")
-- answer: string (the correct answer or a sample good answer)`;
+    // Call VSS blueprint instead of OpenAI
+    const vssPayload = {
+      video_url: url,
+      num_questions: count,
+      difficulty: difficulty,
+      exam_format: format,
+      question_types: types
+    };
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-5.2",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" }
+    console.log("Calling VSS with payload:", vssPayload);
+
+    const response = await fetch(`${VSS_ENDPOINT}/api/generate-exam`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(vssPayload),
+      signal: AbortSignal.timeout(120000) // 2 minute timeout for video processing
     });
 
-    const result = JSON.parse(response.choices[0]?.message?.content || '{"questions": []}');
-    
-    await storage.updateExam(examId, { status: "completed", result });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`VSS API error (${response.status}): ${errorText}`);
+    }
+
+    const result = await response.json();
+
+    // VSS should return format: { questions: [...] }
+    // If format is different, adjust here
+    const formattedResult = {
+      questions: result.questions || result.data?.questions || []
+    };
+
+    await storage.updateExam(examId, { 
+      status: "completed", 
+      result: formattedResult 
+    });
+
+    console.log(`Exam ${examId} completed successfully`);
+
   } catch (error) {
     console.error("Exam generation failed:", error);
-    await storage.updateExam(examId, { status: "failed" });
+    await storage.updateExam(examId, { 
+      status: "failed"
+    });
   }
 }
 
@@ -48,6 +73,29 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  // Health check endpoint to test VSS connection
+  app.get("/api/health", async (req, res) => {
+    try {
+      const vssHealth = await fetch(`${VSS_ENDPOINT}/health`, {
+        signal: AbortSignal.timeout(5000)
+      });
+
+      res.json({
+        status: "ok",
+        vss_connected: vssHealth.ok,
+        vss_endpoint: VSS_ENDPOINT
+      });
+    } catch (error) {
+      res.status(503).json({
+        status: "degraded",
+        vss_connected: false,
+        vss_endpoint: VSS_ENDPOINT,
+        error: error instanceof Error ? error.message : "Cannot reach VSS"
+      });
+    }
+  });
+
   app.get(api.exams.list.path, async (req, res) => {
     const exams = await storage.getExams();
     res.json(exams);
@@ -65,10 +113,17 @@ export async function registerRoutes(
     try {
       const input = api.exams.create.input.parse(req.body);
       const exam = await storage.createExam(input);
-      
-      // Kick off background job for generation
-      generateExam(exam.id, exam.videoUrl, exam.examFormat, exam.difficulty, exam.questionCount, exam.questionTypes).catch(console.error);
-      
+
+      // Kick off background job for generation via VSS
+      generateExam(
+        exam.id, 
+        exam.videoUrl, 
+        exam.examFormat, 
+        exam.difficulty, 
+        exam.questionCount, 
+        exam.questionTypes
+      ).catch(console.error);
+
       res.status(201).json(exam);
     } catch (err) {
       if (err instanceof z.ZodError) {
