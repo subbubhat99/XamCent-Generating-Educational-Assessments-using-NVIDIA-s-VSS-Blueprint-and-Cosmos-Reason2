@@ -8,7 +8,7 @@ import { z } from "zod";
 // const openai = new OpenAI({...});
 
 // VSS endpoint configuration
-const VSS_ENDPOINT = process.env.VSS_ENDPOINT || "http://localhost:9100";
+const VSS_ENDPOINT = process.env.VSS_ENDPOINT || "http://localhost:8100";
 const VSS_API_KEY = process.env.VSS_API_KEY;
 
 async function generateExam(
