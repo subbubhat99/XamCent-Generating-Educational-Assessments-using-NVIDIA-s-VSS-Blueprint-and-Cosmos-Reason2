@@ -34,7 +34,14 @@ XamCent connects to the VSS blueprint module over the backend, via port 8100. As
   <img src="assets/Gemini_Generated_Image_s46c3cs46c3cs46c.png" alt="VSS-Xamcent-Integration" width="900" />
 </p>
 
+1) 📥 **Input Stage** — The user interacts with the XamCent UI and either provides a video file (.mp4,.mov,.avi accepted) or a URL to it, also including entire playlists (excluding those from YouTube owing to their access policy restrictions). This gets passed to the XamCent client which initializes two parallel pipelines.
+2) ⚙️ **VSS Ingestion Pipeline** — The input video stream is split into manageable chunks and decoupled from the audio track. The **Cosmos-Reason-2-2B** parameter model analyzes the content shown throughout the video and generates dense video captions along with CV metadata (since the CV and tracking pipeline is also enabled). The separated audio stream is then processed using the **Riva Automatic Speech Recognition (ASR) NIM** (also enabled) to convert essential descriptions and explanations offered by the tutor on a topic during the video, into easily interpretable transcripts. All three outputs — Dense Captions, CV Metadata, and Audio Transcript — feed upward as a Multimodal Dense Caption into the Graph-RAG system.
+3) 🧠 **Retrieval Pipeline** — User queries are routed through a context manager and guardrails system, which retrieves semantically relevant video chunks from the vector and graph stores, passes them as grounded context to an LLM, and returns a summary and formatted question set to the user.
+4) **Output** — Formatted Question Sets — structured, ready-to-hand-in exam questions derived from the actual video content
+
+
 ### Deployment Steps
+
 
 #### Requirements
 
