@@ -64,14 +64,15 @@ mv vss-xamcent-cookoff.ipynb ~/video-search-and-summarization/deploy/
 cd video-search-and-summarization/deploy/docker/launchables/
 nano config.yaml
 ```
-and replace the ```bash caption ```, ```bash caption_summarization ```, and the ```bash summary_aggregation ``` variables under the ```bash prompts ``` tag with their respective descriptions as given in the configuration file from this directory. Feel free to replace it instead as well, given the only changes needed are in that section.
+and replace the ```caption ```, ```caption_summarization ```, and the ```summary_aggregation ``` variables under the ```prompts ``` tag with their respective descriptions as given in the configuration file from this directory. Feel free to replace it instead as well, given the only changes needed are in that section.
 
 5) Follow the guide within the notebook by executing cells in the order provided.
 6) Once you see the VIA VSS server started and has port 8100 exposed in the backend and the UI available at port 9100, open XamCent at https://xam-cent-question-generator--subbubhat99.replit.app/ and try it out with a video recording stored locally or a URL to a tutorial video (not from YouTube though!)  
 
 #### Requirements
-
-### File Structure
+1) Check the following [prerequisites](https://docs.nvidia.com/vss/latest/content/vss_dep_docker_compose_x86.html#quickstart-docker) are met.
+2) Install the brev-cli if not already.
+**Note** - HF_TOKEN and NGC_API_KEY of the participant are offered in the notebook. 
 
 ### Future Work
 
