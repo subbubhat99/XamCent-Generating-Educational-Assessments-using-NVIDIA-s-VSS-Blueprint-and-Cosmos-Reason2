@@ -76,6 +76,3 @@ and replace the ```caption ```, ```caption_summarization ```, and the ```summary
 
 
 ### Future Work
-
-### About
-
