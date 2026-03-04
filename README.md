@@ -28,7 +28,11 @@ The question set can be formatted in line with internationally recognized entran
 7) Custom design (allowing a paper-setter to follow their local exam pattern)
 
 ### Working
-XamCent connects to the VSS blueprint module over the backend, via port 8100.  
+XamCent connects to the VSS blueprint module over the backend, via port 8100. As illustrated in the following workflow:
+
+<p align="center">
+  <img src="assets/Gemini_Generated_Image_s46c3cs46c3cs46c.png" alt="VSS-Xamcent-Integration" width="900" />
+</p>
 
 ### Deployment Steps
 
