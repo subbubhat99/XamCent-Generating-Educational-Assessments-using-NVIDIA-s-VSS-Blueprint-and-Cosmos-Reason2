@@ -51,15 +51,23 @@ brev shell video-search-and-summarization-blueprint-1ee14a
 # brev port-forward video-search-and-summarization-blueprint-1ee14a -p 9999:8888
 
 ```
-3) Once inside the running instance, the video_search_and_summarization folder should already be found in its root dir. Clone this repository and move the modified jupyter notebook to /video-search-and-summarization/deploy/ (the same directory as the default notebook).\
+3) Once inside the running instance, the video_search_and_summarization folder should already be found in its root dir. Clone this repository and move the modified jupyter notebook to /video-search-and-summarization/deploy/ (the same directory as the default notebook).
 
 ```bash
 git clone https://github.com/subbubhat99/XamCent-Cosmos-Cookoff.git
 cd XamCent-Cosmos-Cookoff
 mv vss-xamcent-cookoff.ipynb ~/video-search-and-summarization/deploy/
 ```
+4) Now navigate to the configuration file that the default notebook uses for launching all NIM's and the VIA server using docker compose.
 
+```bash
+cd video-search-and-summarization/deploy/docker/launchables/
+nano config.yaml
+```
+and replace the ```bash caption ```, ```bash caption_summarization ```, and the ```bash summary_aggregation ``` variables under the ```bash prompts ``` tag with their respective descriptions as given in the configuration file from this directory. Feel free to replace it instead as well, given the only changes needed are in that section.
 
+5) Follow the guide within the notebook by executing cells in the order provided.
+6) Once you see the VIA VSS server started and has port 8100 exposed in the backend and the UI available at port 9100, open XamCent at https://xam-cent-question-generator--subbubhat99.replit.app/ and try it out with a video recording stored locally or a URL to a tutorial video (not from YouTube though!)  
 
 #### Requirements
 
