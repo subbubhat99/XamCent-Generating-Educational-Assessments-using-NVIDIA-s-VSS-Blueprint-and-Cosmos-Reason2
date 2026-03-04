@@ -1,7 +1,5 @@
-<p align="center">
-  <img src="assets/xamcent-logo.png" alt="XamCent Logo" height="56" style="vertical-align: middle; margin-right: 10px;" />
-  <span style="font-size: 2.2rem; font-weight: 700; vertical-align: middle;">XamCent</span>
-</p>
+<h1 align="center">XamCent</h1>
+
 
 <p align="center">
   <a href="#recipe">Recipe</a> |
