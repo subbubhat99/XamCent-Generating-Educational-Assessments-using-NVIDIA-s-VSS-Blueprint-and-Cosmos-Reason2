@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <a href="#recipe">Recipe</a> |
+  <a href="#recipe">The Recipe</a> |
   <a href="#working">Working</a> |
   <a href="#deployment-steps">Deployment Steps</a> |
   <a href="#future-work">Future Work</a> |
