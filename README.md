@@ -54,7 +54,8 @@ brev shell video-search-and-summarization-blueprint-1ee14a
 ```bash
 git clone https://github.com/subbubhat99/XamCent-Cosmos-Cookoff.git
 cd XamCent-Cosmos-Cookoff
-mv vss-xamcent-cookoff.ipynb ~/video-search-and-summarization/deploy/
+mv vss-xamcent-cookoff.ipynb /home/ubuntu/video-search-and-summarization/deploy/  # move modified jupyter notebook into the /deploy folder
+mv config.yaml /home/ubuntu/video-search-and-summarization/deploy/docker/launchables/ # also move the config file with a modified user prompt
 ```
 4) Now navigate to the configuration file that the default notebook uses for launching all NIM's and the VIA server using docker compose.
 
